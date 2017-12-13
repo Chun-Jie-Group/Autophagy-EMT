@@ -17,7 +17,7 @@ purrr::map2(filter_autophage_expr$expr,EMT_sco$EMT_score,function(x,y){
 
 library(ComplexHeatmap)
 library(circlize)
-pdf(file.path(pdf_path, "all.pdf"), width=8.5, height = 11)
+pdf(file.path(pdf_path, "all_expr_heatmap.pdf"), width=8.5, height = 11)
 purrr::walk2(filter_autophage_cpm$expr,filter_autophage_cpm$cancer_type,function(x,y){
   ha=HeatmapAnnotation(
     df = data.frame(EMT_score=sort(as.numeric(colnames(x[,-1])))),
