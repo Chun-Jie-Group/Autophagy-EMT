@@ -16,6 +16,8 @@ filter_autophagy_gene=function(.x){
 
 purrr::map(.x=expr$expr,filter_autophagy_gene) %>%
 tibble::tibble("cancer_types"=expr$cancer_types,"expr"=.) -> filter_autophage_expr
+readr::write_rds(filter_autophage_expr,path ="/home/shimw/TCGA/pancan33_filter_autophage_expr.rds.gz",compress = "gz")
+
 
 #dataframe of autophagy gene expr and emt score
 
@@ -54,3 +56,5 @@ purrr::map2(autophage_emt_cor$cancer_types,autophage_emt_cor$autophage_emt,funct
 rownames(heatmap_matrix) <- cor_matrix$symbol
 
 pheatmap(heatmap_matrix,col = bluered(100),fontsize_row =4,main = "Correlation of the expression of key genes in autophage with EMT score by tumor type",filename = "/home/shimw/TCGA/correlation_heatmap.pdf",width = 8.5,height = 11)
+
+
