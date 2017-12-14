@@ -2,21 +2,27 @@ path<-"/home/shimw/TCGA/"
 pdf_path<- "/home/shimw/TCGA/heatmap/"
 filter_autophage_expr <- readr::read_rds(file.path(path,"pancan33_filter_autophage_expr.rds.gz"))
 EMT_sco <- readr::read_rds(file.path(path,"pancan33_EMT_score.rds.gz"))
-library(edgeR)
+
 purrr::map2(filter_autophage_expr$expr,EMT_sco$EMT_score,function(x,y){
-  DGEList(counts = x[,-c(1,2)],genes = x[,1]) %>%
-    calcNormFactors() %>%
-    cpm(log=TRUE,prior.count = 0.0001) %>% t() %>%
+
+  dplyr::select(x, -symbol, -entrez_id) %>%
+ purrr::map(function(m){
+   ifelse(m==0,0.0001,m)
+ }) %>%
+    dplyr::bind_rows()%>%
+    log2() %>%
+  t() %>%
     scale(center = T,scale = T) %>% t() %>%
     tibble::as.tibble() %>%
     tibble::add_column(.,"symbol"=x$symbol,.before = 1) -> temp
   names(temp)[-1] = y$EMT_score
-    temp
+    return(temp)
 }) %>%
-  tibble::tibble("cancer_type"=filter_autophage_expr$cancer_types,"expr"=.) -> filter_autophage_cpm
+  tibble::tibble("cancer_type"=filter_autophage_expr$cancer_types,"expr"=.) -> filter_autophage_scale
 
 library(ComplexHeatmap)
 library(circlize)
+dev.off()
 pdf(file.path(pdf_path, "all_expr_heatmap.pdf"), width=8.5, height = 11)
 purrr::walk2(filter_autophage_cpm$expr,filter_autophage_cpm$cancer_type,function(x,y){
   ha=HeatmapAnnotation(

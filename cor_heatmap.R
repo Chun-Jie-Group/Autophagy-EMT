@@ -23,10 +23,15 @@ readr::write_rds(filter_autophage_expr,path ="/home/shimw/TCGA/pancan33_filter_a
 
 purrr::map2(emt_score$EMT_score,filter_autophage_expr$expr,function(x,y){
 
-  t_y <- tibble::as.tibble(t(y[,-c(1,2)]))
-  names(t_y) <- t(y)[1,]
+ # t_y <- tibble::as.tibble(t(y[,-c(1,2)]))
+  #names(t_y) <- t(y)[1,]
   
-  t_y %>%
+#  t_y %>%
+  dplyr::select(y, -entrez_id) %>%
+    as.data.frame() %>%
+    tibble::column_to_rownames(.,var = "symbol")%>%
+    t() %>% tibble::as.tibble()%>%
+    
   
     purrr::map(.,function(m){
       m = ifelse(m==0,0.0001,m)
@@ -38,7 +43,7 @@ purrr::map2(emt_score$EMT_score,filter_autophage_expr$expr,function(x,y){
         
     }) %>%
     dplyr::bind_rows()%>%
-    tibble::add_column(.,"symbol"=names(t_y),.before = 1)
+    tibble::add_column(.,"symbol"=y$symbol,.before = 1)
 }) %>%
 tibble::tibble("cancer_types"=expr$cancer_types,"autophage_emt"=.) -> autophage_emt_cor
 
