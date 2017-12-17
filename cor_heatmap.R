@@ -59,7 +59,7 @@ purrr::map2(autophage_emt_cor$cancer_types,autophage_emt_cor$autophage_emt,funct
   tidyr::spread(tumor_type,coef) -> cor_matrix
   heatmap_matrix<- as.matrix(cor_matrix[,-1])
 rownames(heatmap_matrix) <- cor_matrix$symbol
- 
+
 pheatmap(heatmap_matrix,col = bluered(100),fontsize_row =4,main = "Correlation of the expression of key genes in autophage with EMT score by tumor type",filename = "/home/shimw/TCGA/correlation_heatmap.pdf",width = 8.5,height = 11)
 
 
