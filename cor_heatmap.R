@@ -8,20 +8,20 @@ autophagy_gene <-autophagy_gene[-which(autophagy_gene$gene_symbol=="ATP6V1G3"),]
 expr <- readr::read_rds(expr_path)
 emt_score <-  readr::read_rds(EMT_score_path)
 
-#filter autophage expr
+#filter autophagy expr
 filter_autophagy_gene=function(.x){
   .x %>%
     dplyr::filter(symbol%in%autophagy_gene$gene_symbol)
 }
 
 purrr::map(.x=expr$expr,filter_autophagy_gene) %>%
-tibble::tibble("cancer_types"=expr$cancer_types,"expr"=.) -> filter_autophage_expr
-readr::write_rds(filter_autophage_expr,path ="/home/shimw/TCGA/pancan33_filter_autophage_expr.rds.gz",compress = "gz")
+tibble::tibble("cancer_types"=expr$cancer_types,"expr"=.) -> filter_autophagy_expr
+readr::write_rds(filter_autophagy_expr,path ="/home/shimw/TCGA/pancan33_filter_autophagy_expr.rds.gz",compress = "gz")
 
 
 #dataframe of autophagy gene expr and emt score
 
-purrr::map2(emt_score$EMT_score,filter_autophage_expr$expr,function(x,y){
+purrr::map2(emt_score$EMT_score,filter_autophagy_expr$expr,function(x,y){
 
  # t_y <- tibble::as.tibble(t(y[,-c(1,2)]))
   #names(t_y) <- t(y)[1,]
@@ -45,12 +45,12 @@ purrr::map2(emt_score$EMT_score,filter_autophage_expr$expr,function(x,y){
     dplyr::bind_rows()%>%
     tibble::add_column(.,"symbol"=y$symbol,.before = 1)
 }) %>%
-tibble::tibble("cancer_types"=expr$cancer_types,"autophage_emt"=.) -> autophage_emt_cor
+tibble::tibble("cancer_types"=expr$cancer_types,"autophagy_emt"=.) -> autophagy_emt_cor
 
 #heatmap
 ##as.matrix
 library(pheatmap)
-purrr::map2(autophage_emt_cor$cancer_types,autophage_emt_cor$autophage_emt,function(x,y){
+purrr::map2(autophagy_emt_cor$cancer_types,autophagy_emt_cor$autophagy_emt,function(x,y){
   y%>%
     tibble::add_column(.,"tumor_type"=x)
 })%>%
@@ -60,6 +60,6 @@ purrr::map2(autophage_emt_cor$cancer_types,autophage_emt_cor$autophage_emt,funct
   heatmap_matrix<- as.matrix(cor_matrix[,-1])
 rownames(heatmap_matrix) <- cor_matrix$symbol
 
-pheatmap(heatmap_matrix,col = bluered(100),fontsize_row =4,main = "Correlation of the expression of key genes in autophage with EMT score by tumor type",filename = "/home/shimw/TCGA/correlation_heatmap.pdf",width = 8.5,height = 11)
+pheatmap(heatmap_matrix,col = bluered(100),fontsize_row =4,main = "Correlation of the expression of key genes in autophagy with EMT score by tumor type",filename = "/home/shimw/TCGA/correlation_heatmap.pdf",width = 8.5,height = 11)
 
 
