@@ -1,9 +1,9 @@
 path<-"/home/shimw/TCGA/"
 pdf_path<- "/home/shimw/TCGA/heatmap/"
-filter_autophage_expr <- readr::read_rds(file.path(path,"pancan33_filter_autophage_expr.rds.gz"))
+filter_autophagy_expr <- readr::read_rds(file.path(path,"pancan33_filter_autophagy_expr.rds.gz"))
 EMT_sco <- readr::read_rds(file.path(path,"pancan33_EMT_score.rds.gz"))
 
-purrr::map2(filter_autophage_expr$expr,EMT_sco$EMT_score,function(x,y){
+purrr::map2(filter_autophagy_expr$expr,EMT_sco$EMT_score,function(x,y){
 
   dplyr::select(x, -symbol, -entrez_id) %>%
  purrr::map(function(m){
@@ -18,13 +18,13 @@ purrr::map2(filter_autophage_expr$expr,EMT_sco$EMT_score,function(x,y){
   names(temp)[-1] = y$EMT_score
     return(temp)
 }) %>%
-  tibble::tibble("cancer_type"=filter_autophage_expr$cancer_types,"expr"=.) -> filter_autophage_scale
+  tibble::tibble("cancer_type"=filter_autophagy_expr$cancer_types,"expr"=.) -> filter_autophagy_scale
 
 library(ComplexHeatmap)
 library(circlize)
 dev.off()
 pdf(file.path(pdf_path, "all_expr_heatmap.pdf"), width=8.5, height = 11)
-purrr::walk2(filter_autophage_cpm$expr,filter_autophage_cpm$cancer_type,function(x,y){
+purrr::walk2(filter_autophagy_cpm$expr,filter_autophagy_cpm$cancer_type,function(x,y){
   ha=HeatmapAnnotation(
     df = data.frame(EMT_score=sort(as.numeric(colnames(x[,-1])))),
   
@@ -37,7 +37,7 @@ purrr::walk2(filter_autophage_cpm$expr,filter_autophage_cpm$cancer_type,function
     data.matrix() %>%
     Heatmap(
       .,
-      col=colorRamp2(c(-2, 0, 2), c("blue", "white", "yellow"), space = "RGB"),
+      col=colorRamp2(c(-2, 0, 2), c("blue", "white", "#EEEE00"), space = "RGB"),
       name="Expression",
       top_annotation = ha,
       column_title = y,
@@ -55,7 +55,7 @@ purrr::walk2(filter_autophage_cpm$expr,filter_autophage_cpm$cancer_type,function
   draw(ht)
 
 })
- 
+
 dev.off()
 
 
