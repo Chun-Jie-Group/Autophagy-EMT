@@ -60,6 +60,31 @@ purrr::map2(autophagy_emt_cor$cancer_types,autophagy_emt_cor$autophagy_emt,funct
   heatmap_matrix<- as.matrix(cor_matrix[,-1])
 rownames(heatmap_matrix) <- cor_matrix$symbol
 
-pheatmap(heatmap_matrix,col = bluered(100),fontsize_row =4,main = "Correlation of the expression of key genes in autophagy with EMT score by tumor type",filename = "/home/shimw/TCGA/correlation_heatmap.pdf",width = 8.5,height = 11)
+
+
+#red <- factoextra::hcut(t(heatmap_matrix), k = 2, hc_func = 'hclust', hc_method = 'ward.D', hc_metric = 'pearson', stand = T)
+
+
+#res <- factoextra::hcut(heatmap_matrix, k = 2, hc_func = 'hclust', hc_method = 'ward.D', hc_metric = 'pearson', stand = T)
+heatmap_matrix[res$order,red$order]
+
+ Heatmap(
+   heatmap_matrix[res$order,red$order],
+   col = colorRamp2(c(-0.7, 0, 0.7), c("blue", "white", "red"), space = "RGB"),
+   name="Correlation",
+   #top_annotation  = ha,
+   show_row_names = T, 
+   show_column_names = T,
+   cluster_columns = FALSE,
+   cluster_rows = FALSE,
+  # clustering_distance_columns = "pearson",
+  # clustering_method_columns = "ward.D",
+  # clustering_distance_rows = "pearson",
+  # clustering_method_rows = "ward.D",
+  # row_names_gp = gpar(fontsize = 5)
+ )
+
+
+#pheatmap(heatmap_matrix,col = bluered(100),fontsize_row =4,main = "Correlation of the expression of key genes in autophagy with EMT score by tumor type",filename = "/home/shimw/TCGA/correlation_heatmap.pdf",width = 8.5,height = 11)
 
 
