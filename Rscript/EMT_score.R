@@ -1,4 +1,5 @@
 #EMT_score
+library(magrittr)
 expr <- readr::read_rds("/data/TCGA/TCGA_data/pancan33_expr.rds.gz")
 signature_list <- readr::read_csv("/home/shimw/signature.csv",col_names =T)
 
@@ -6,7 +7,7 @@ filter_makers_gene=function(.x){
     .x %>%
     dplyr::filter(symbol%in%signature_list$gene)%>%
     ##get the tumor expr
-    dplyr::select(matches("TCGA-.{2}-.{4}-0[1-9].-.{3}-.{4}-.{2}"))
+    dplyr::select(symbol,entrez_id,matches("TCGA-.{2}-.{4}-0[1-9].-.{3}-.{4}-.{2}"))
   
 }
 
