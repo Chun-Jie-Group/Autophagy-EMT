@@ -61,8 +61,10 @@ purrr::map2(emt_score$EMT_score,filter_autophagy_expr$expr,function(x,y){
    dplyr::mutate(p.value = -log10(p.value)) %>% 
    dplyr::mutate(p.value = ifelse(p.value > 15, 15, p.value)) %>% 
    dplyr::filter(fdr <= 0.05) %>%
+   dplyr::filter(abs(coef)>=0.3)%>%
+   dplyr::mutate(coef = ifelse(coef > 0.6, 0.6, coef)) %>%
+   dplyr::mutate(coef = ifelse(coef < -0.6, -0.6, coef)) %>%
    dplyr::mutate(fdr = -log10(fdr)) %>% 
-   
    dplyr::mutate(fdr = ifelse(fdr > 15, 15, fdr)) -> autophagy_emt_cor
 
 #order the gene by median
@@ -81,7 +83,7 @@ autophagy_emt_cor%>%
   dplyr::rowwise() %>%
   dplyr::do(
     symbol = .$symbol,
-    rank =  unlist(.[-1], use.names = F) %>% sum(na.rm = TRUE),
+    rank =  unlist(.[-1], use.names = F) %>% sum(na.rm = TRUE)
   ) %>%
   dplyr::ungroup() %>%
   tidyr::unnest() %>%
@@ -110,9 +112,9 @@ autophagy_emt_cor %>%
       high = CPCOLS[1],
       midpoint = 0,
       na.value = "white",
-      breaks=seq(-1, 1,length.out = 9),
-      limit = c(-1,1),
-
+      breaks=seq(-0.5, 0.5,length.out = 5),
+      limit = c(-0.6,0.6),
+      labels = c("-0.5", "-0.25", "0", "0.25", "0.5"),
       name = "Correlation"
     ) +
     scale_size_continuous(
@@ -146,8 +148,10 @@ autophagy_emt_cor %>%
       legend.key = element_rect(fill = "white", colour = "black")
     ) ->p
     
+  
+  
   ggsave(
-    filename = "point_plot.pdf",
+    filename = "bubble_plot_filter.pdf",
     plot = p,
     device = "pdf",
     width = 8.5,
