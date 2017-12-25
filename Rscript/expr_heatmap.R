@@ -1,5 +1,5 @@
 path<-"/home/shimw/TCGA/"
-pdf_path<- "/home/shimw/TCGA/heatmap/"
+pdf_path<- "/home/shimw/github/EMT/pdf/"
 filter_autophagy_expr <- readr::read_rds(file.path(path,"pancan33_filter_autophagy_expr.rds.gz"))
 EMT_sco <- readr::read_rds(file.path(path,"pancan33_EMT_score.rds.gz"))
 
@@ -22,9 +22,9 @@ purrr::map2(filter_autophagy_expr$expr,EMT_sco$EMT_score,function(x,y){
 
 library(ComplexHeatmap)
 library(circlize)
-dev.off()
+
 pdf(file.path(pdf_path, "all_expr_heatmap.pdf"), width=8.5, height = 11)
-purrr::walk2(filter_autophagy_cpm$expr,filter_autophagy_cpm$cancer_type,function(x,y){
+purrr::walk2(filter_autophagy_scale$expr,filter_autophagy_scale$cancer_type,function(x,y){
   ha=HeatmapAnnotation(
     df = data.frame(EMT_score=sort(as.numeric(colnames(x[,-1])))),
   
