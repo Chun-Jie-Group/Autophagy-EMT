@@ -20,12 +20,12 @@ M_list <- signature_list$gene[signature_list$E_VS_M=="M"]
 E_list <- signature_list$gene[signature_list$E_VS_M=="E"]
 
 M_score <- function(m){
-  m=ifelse(m==0,0.001,m)
+  m=ifelse(m==0,0.0001,m)
   sum(log2(m))/52
 }
 
 E_score <- function(m){
-  m=ifelse(m==0,0.001,m)
+  m=ifelse(m==0,0.0001,m)
   sum(log2(m))/25
 }
 
