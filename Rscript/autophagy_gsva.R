@@ -59,7 +59,7 @@ emt_with_gsva=purrr::map2(emt_gsva$EMT_score,emt_gsva$gsva,function(.x,.y){
 )->emt_with_gsva
 
 
-#caculate the correlate------------------------------------------
+#calculate the correlate------------------------------------------
 correlation=purrr::map(emt_with_gsva$emt_with_gsva,function(.x){
   cor.test(.x$EMT_score,.x$gsva)->cor
   return(cor$estimate[[1]])
