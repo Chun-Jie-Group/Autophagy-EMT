@@ -88,6 +88,7 @@ cor_gsva%>%
     })%>%
     dplyr::bind_rows()%>%
     ggplot(aes(x=EMT_score,y=gsva)) +geom_point(aes(colour=tumor_type))+
+    scale_color_manual(values=c("#FAD2D9", "#97D1A9", "#A084BD","#6E7BA2","#00A99D"))+
     theme(
       panel.background = element_rect(colour = "black", fill = "white"),
       panel.grid = element_line(colour = "grey", linetype = "dashed"),
@@ -102,7 +103,7 @@ cor_gsva%>%
     filename = "gsva_point.pdf",
     plot = p,
     device = "pdf",
-    width = 8,
+    width = 10,
     height = 8,
     path = "/home/shimw/github/EMT/pdf"
   )
@@ -117,7 +118,11 @@ cor_gsva%>%
 
 
 cor_gsva%>%
-  ggplot(aes(cancer_type,correlation))+geom_bar(stat = "identity")+
+    dplyr::arrange(desc(correlation))%>%
+    dplyr::mutate(fdr = -log10(fdr)) %>% 
+    dplyr::mutate(fdr = ifelse(fdr > 15, 15, fdr))->cor_gsva
+cor_gsva%>%
+  ggplot(aes(cancer_type,correlation))+geom_point(aes(size=fdr))+
   scale_x_discrete(limits=cor_gsva$cancer_type)+
   theme(
     axis.text.x = element_text(angle = 90),
@@ -128,14 +133,24 @@ cor_gsva%>%
       linetype = "dashed",
       size = 0.2
     ),
-    axis.ticks = element_line(color = "black")
+    axis.ticks = element_line(color = "black"),
+    legend.text.align = 0.5
+  )+
+  scale_size_continuous(
+    limit = c(-log10(0.05),15),
+
+    range = c(1, 4),
+    breaks = c(-log10(0.05), 5, 10, 15),
+    labels = c("0.05", latex2exp::TeX("$10^{-5}$"), latex2exp::TeX("$10^{-10}$"), latex2exp::TeX("$< 10^{-15}$")),
+    
+    name = "FDR"
   )-> p
   ggsave(
     filename = "gsva_cor_bar.pdf",
     plot = p,
     device = "pdf",
-    width = 8.5,
-    height = 11,
+    width = 8,
+    height = 8,
     path = "/home/shimw/github/EMT/pdf"
   )
 
